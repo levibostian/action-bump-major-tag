@@ -11,10 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # push git commits/releases 
-      issues: write # comments on issues 
-      pull-requests: write # comment on PRs 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
@@ -22,18 +20,12 @@ jobs:
       - run: npm run compile 
 
       - name: Deploy via semantic release 
-        uses: cycjimmy/semantic-release-action@v2
+        uses: cycjimmy/semantic-release-action@v4
         with: 
-          # version numbers below can be in many forms: M, M.m, M.m.p
-          # Hard-coding version as workaround https://github.com/semantic-release/commit-analyzer/issues/517#issuecomment-1697193361
-          semantic_version: 18
           extra_plugins: |
             conventional-changelog-conventionalcommits@6.1.0 
-            @semantic-release/commit-analyzer@9
-            @semantic-release/release-notes-generator@10
-            @semantic-release/changelog@6
-            @semantic-release/git@10
-            @semantic-release/github@8
+            @semantic-release/git
+            @semantic-release/github
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,5 +35,10 @@ jobs:
     permissions:
       contents: write # so it can push a tag
     steps:
-      # Will automatically release vX for major releases after each deployment
-      - uses: Actions-R-Us/actions-tagger@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc'
+    - run: npm ci
+    - run: npm run compile 
+    - uses: ./
