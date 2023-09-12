@@ -1,0 +1,13 @@
+name: "conventional pull request linter"
+description: "GitHub Action that lints pull request titles to assert it conforms to a conventional changelog spec. Great companion to tools such as semantic-release to feel more confident in merging a PR."
+author: "levibostian"
+inputs: 
+ token:
+    description: "A GitHub token used for making requests to Github's API"
+    default: ${{ github.token }}
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: 'check'  
+  color: 'green'

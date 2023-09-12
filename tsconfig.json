@@ -1,0 +1,11 @@
+{
+  "extends": "@levibostian/tsconfigs/node16/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "paths": {
+      "*": ["node_modules/*", "@types/*"]
+    },
+    "typeRoots": ["@types", "./node_modules/@types"]
+  },
+  "include": ["app/**/*", "@types/**/*"]
+}
