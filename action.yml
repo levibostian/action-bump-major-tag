@@ -2,9 +2,12 @@ name: "update major version tags"
 description: "GitHub Action that updates a major version tag (v1, v2, etc) from the latest git tags made. There are similar tools that already exist, but all require they are executed after a new git tag is made. This action is designed to run anytime you wish by querying the GitHub repository for already created tags and updates from that."
 author: "levibostian"
 inputs: 
- token:
+  token:
     description: "A GitHub token used for making requests to Github's API"
     default: ${{ github.token }}
+  tag-prefix:
+    description: "(optional) Prefix to add to each major version created/updated. Example: 'v' will create tags like 'v1', 'v2', etc."
+    default: ""
 runs:
   using: "node20"
   main: "dist/index.js"

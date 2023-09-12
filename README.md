@@ -29,6 +29,14 @@ jobs:
     - uses: levibostian/action-bump-major-tag@v1
 ```
 
+# Configure 
+
+```yml
+- uses: levibostian/action-bump-major-tag@v1
+  with:
+    tag-prefix: "v" # (optional) Prefix to add to each major version created/updated. Example: 'v' will create tags like 'v1', 'v2', etc.
+```
+
 # Development
 
 - `npm install`
