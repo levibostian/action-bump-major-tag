@@ -1,59 +1,32 @@
 import { inputs } from "./input"
-import { lintPrTitle } from "./lint"
 import { context as githubContext, getOctokit } from "@actions/github"
-import { terminate } from "./env"
 import * as log from "./log"
-import * as cathy from "cathy"
-import { getInvalidPrTitleHelp } from "./helper_messages"
-;(async () => {
-  log.debug("Checking if action was triggered by a PR")
+import { filterValidTags, mapLatestVersionWithMajorVersion } from "./tags"
 
-  if (githubContext.eventName != "pull_request") {
-    log.info(
-      "GitHub Action workflow trigger is not a pull_request. Nothing for me to do. I'll just exit."
-    )
-    return terminate()
-  }
-
-  log.debug("Getting input and context from action")
-  const prNumber = githubContext.payload.pull_request?.number
-  if (!prNumber) {
-    log.info(
-      "GitHub Action must not have triggered by a pull_request because I cannot find a pull request number. Nothing for me to do. I'll just exit."
-    )
-    return terminate()
-  }
-  log.debug(`Action running against PR ${prNumber}`)
-
+;import { Tag } from "./type/tag";
+(async () => {  
   const octokit = getOctokit(inputs.token)
 
-  const pullRequest = await octokit.rest.pulls.get({
+  // using octokit, get all of the git tags created in the repository
+  let repoTags: Tag[] = await octokit.paginate(octokit.rest.repos.listTags, {
     owner: githubContext.repo.owner,
-    repo: githubContext.repo.repo,
-    pull_number: prNumber
+    repo: githubContext.repo.repo
   })
+  
+  repoTags = filterValidTags(repoTags)
 
-  log.debug(`GitHub pull request: ${JSON.stringify(pullRequest.data)}`)
-  const prTitle = pullRequest.data.title
-  const prAuthor = pullRequest.data.user?.login || ""
+  // finds the latest semantic version for each major version. this determines that tag that should be pointed to for each major version tag. 
+  const latestVersionWithMajorVersion = mapLatestVersionWithMajorVersion(repoTags, inputs.tagPrefix)
 
-  const isTitleValid = await lintPrTitle(prTitle)
-  if (!isTitleValid) {
-    await cathy.speak(
-      getInvalidPrTitleHelp({
-        author: prAuthor
-      }),
-      {
-        githubToken: inputs.token,
-        githubRepo: `${githubContext.repo.owner}/${githubContext.repo.repo}`,
-        githubIssue: prNumber,
-        updateExisting: true,
-        updateID: "action-semantic-pr_help-pr-title"
-      }
-    )
+  for (const [latestVersion, majorVersion] of latestVersionWithMajorVersion) {    
+    log.info(`Creating or updating major version tag: ${majorVersion}, pointing to existing tag: ${latestVersion}`)
 
-    return terminate(new Error(`Pull request title, ${prTitle}, is not valid.`))
+    await octokit.rest.git.createRef({
+      owner: githubContext.repo.owner,
+      repo: githubContext.repo.repo,
+      ref: `refs/tags/${majorVersion}`,
+      sha: latestVersion.commit.sha
+    })
   }
-
-  log.info(`Looks like the PR title, ${prTitle}, is valid!`)
 })()
+
