@@ -2,7 +2,7 @@ name: Deploy action
 
 on:
   push:
-    branches: [main, beta, alpha]
+    branches: [none] # [main, beta, alpha]
   workflow_dispatch: # allow manually deploying from Actions tab
 
 jobs:
