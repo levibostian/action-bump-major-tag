@@ -2,7 +2,8 @@
   "name": "@levibostian/action-bump-major-tag",
   "version": "1.0.0",
   "scripts": {
-    "test": "npx jest"
+    "test": "npx jest",
+    "compile": "rm -rf dist/ && npx ncc build app/index.ts --minify --source-map -o dist"
   },
   "license": "MIT",
   "prettier": "@levibostian/prettier-config",
