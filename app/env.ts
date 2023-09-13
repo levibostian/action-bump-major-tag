@@ -1,10 +1,8 @@
-import { setFailed, ExitCode } from "@actions/core"
-import { exit } from "process"
+import { context } from "@actions/github";
 
-export const terminate = (failure?: string | Error): void => {
-  if (failure) {
-    setFailed(failure)
-  } else {
-    exit(ExitCode.Success)
+export function getRepo(): {owner: string, repo: string} {
+  return {
+    owner: context.repo.owner,
+    repo: context.repo.repo
   }
 }
