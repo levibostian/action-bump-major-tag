@@ -13,13 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Copy commits into latest branch 
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git checkout -b latest
-        git rebase main
-        git push origin latest          
+    - name: Merge main -> latest to trigger a deploy on latest 
+      uses: devmasx/merge-branch@v1.4.0
+      with:
+        type: now
+        from_branch: main
+        target_branch: latest
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     
     # We manually run here because github will not execute github actions as a result of commits being pushed to latest branch. 
     - name: Trigger deploy 
