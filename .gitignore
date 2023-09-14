@@ -1,6 +1,7 @@
 coverage/
 junit.xml
 .DS_Store
+dist/
 
 # Logs
 logs

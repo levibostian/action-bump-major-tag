@@ -13,9 +13,10 @@
       "preset": "conventionalcommits"
     }],
     ["@semantic-release/git", {
-      "assets": ["dist", "CHANGELOG.md"],
-      "message": "chore: ${nextRelease.version}\n\n${nextRelease.notes}"
+      "assets": ["dist"],
+      "message": "chore: package ${nextRelease.version}"
     }],
-    "@semantic-release/github"
+    "@semantic-release/github",
+    "semantic-release-recovery"
   ]
 }

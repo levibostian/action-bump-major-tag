@@ -1,9 +1,7 @@
 name: Deploy action
 
-on:
-  push:
-    branches: [none] # [main, beta, alpha]
-  workflow_dispatch: # allow manually deploying from Actions tab
+on:  
+  workflow_dispatch: # this workflow gets manually executed when commits merged into main 
 
 jobs:
   deploy-git-tag-and-release:
@@ -20,12 +18,13 @@ jobs:
       - run: npm run compile 
 
       - name: Deploy via semantic release 
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v4        
         with: 
+          branch: latest # have this match what this workflow triggers on
           extra_plugins: |
             conventional-changelog-conventionalcommits@6.1.0 
+            semantic-release-recovery
             @semantic-release/git
-            @semantic-release/github
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,5 +42,4 @@ jobs:
     - run: npm run compile 
     - uses: ./
       with:
-        tag-prefix: 'v'
-        
+        tag-prefix: 'v'        
